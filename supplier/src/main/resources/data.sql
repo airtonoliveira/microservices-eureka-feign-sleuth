@@ -1,2 +1,2 @@
-insert into StateInfo(id,name,state,address)
+insert into STATE_INFO(id,name,state,address)
 values(10001,'AIR','PE','Avenue 01');
