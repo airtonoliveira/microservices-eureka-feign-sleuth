@@ -19,7 +19,7 @@ public class PurchaseService {
     private SupplierClient supplierClient;
 
     public Purchase makePurchase(PurchaseDTO purchase) {
-        
+
         SupplierInfoDTO info = supplierClient.getInfoByState(purchase.getAddress().getState());
 
         OrderInfoDTO order = supplierClient.makeOrder(purchase.getItems());
