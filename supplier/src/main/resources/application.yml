@@ -1,16 +1,11 @@
 server:
   port: 8182
 spring:
-  datasource:
-    url: jdbc:h2:mem:supplierdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-    platform: h2
-  h2:
-    console:
-      enabled: true
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
+  application:
+    name: supplier
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

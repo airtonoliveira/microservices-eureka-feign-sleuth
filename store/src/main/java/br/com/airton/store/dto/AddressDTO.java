@@ -16,4 +16,9 @@ public class AddressDTO {
     public String getState() {
         return state;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Avenue: %s, Number: %s, State: %s.", getAvenue(), getNumber(), getState());
+    }
 }

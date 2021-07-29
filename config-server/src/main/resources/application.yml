@@ -1,0 +1,18 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: configserver
+  #profiles:
+  #  active: native
+  cloud:
+    config:
+      server:
+        git:
+          default-label: main #IMPORTANT: because of the changes on how branches are named on github we need to specify the new "main" label.
+          uri: https://github.com/airtonoliveira/store-microservices-config-repo
+          search-paths: supplier
+
+        #native: #(USADO PARA CONFIGS EM ARQUIVO LOCAL)
+          #search-locations: C:\workspace\Alura\microservices-eureka-feign-sleuth\config-files
+

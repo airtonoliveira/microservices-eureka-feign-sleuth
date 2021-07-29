@@ -1,0 +1,6 @@
+server:
+  port: 8761
+eureka:
+  client:
+    fetch-registry: false #Não vai guardar informações de outras aplicações, nem cachear localmente.
+    register-with-eureka: false #Não vai se registrar no eureka.
