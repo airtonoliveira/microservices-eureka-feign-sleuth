@@ -5,15 +5,10 @@ import br.com.airton.store.dto.OrderInfoDTO;
 import br.com.airton.store.dto.SupplierInfoDTO;
 import br.com.airton.store.dto.PurchaseDTO;
 import br.com.airton.store.model.Purchase;
-import com.netflix.discovery.converters.Auto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class PurchaseService {
@@ -24,11 +19,11 @@ public class PurchaseService {
     private SupplierClient supplierClient;
 
     public Purchase makePurchase(PurchaseDTO purchase) {
+        
         SupplierInfoDTO info = supplierClient.getInfoByState(purchase.getAddress().getState());
 
         OrderInfoDTO order = supplierClient.makeOrder(purchase.getItems());
-
-        LOG.info("makePurchase - return value: "+info.getAddress());
+        LOG.info("Order {} sent to Supplier.", order.getId());
 
         Purchase purchaseDB = new Purchase();
         purchaseDB.setOrderId(order.getId());

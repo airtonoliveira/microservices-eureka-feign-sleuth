@@ -6,6 +6,8 @@ import br.com.airton.supplier.model.OrderItem;
 import br.com.airton.supplier.model.Product;
 import br.com.airton.supplier.repository.OrderRepository;
 import br.com.airton.supplier.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
-	
+
+	private static final Logger LOG = LoggerFactory.getLogger(OrderService.class);
+
 	@Autowired
 	private OrderRepository orderRepository;
 	
@@ -30,7 +34,10 @@ public class OrderService {
 		List<OrderItem> pedidoItens = toOrderItem(itens);
 		OrderMade order = new OrderMade(pedidoItens);
 		order.setPreparationTime(itens.size());
-		return orderRepository.save(order);
+		order = orderRepository.save(order);
+		LOG.info("Order {} saved.", order.getId());
+		return order;
+
 	}
 	
 	public OrderMade getOrderById(Long id) {
@@ -38,7 +45,8 @@ public class OrderService {
 	}
 
 	private List<OrderItem> toOrderItem(List<OrderItemDTO> items) {
-		
+
+		LOG.info("Converting OrderItemDTO to OrderItem...");
 		List<Long> productsIds = items
 				.stream()
 				.map(item -> item.getId())
