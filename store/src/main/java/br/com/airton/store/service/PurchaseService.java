@@ -5,6 +5,9 @@ import br.com.airton.store.dto.OrderInfoDTO;
 import br.com.airton.store.dto.SupplierInfoDTO;
 import br.com.airton.store.dto.PurchaseDTO;
 import br.com.airton.store.model.Purchase;
+//import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.ObservableExecutionMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ public class PurchaseService {
     @Autowired
     private SupplierClient supplierClient;
 
+    @HystrixCommand(fallbackMethod = "makePurchaseFallback")
     public Purchase makePurchase(PurchaseDTO purchase) {
 
         SupplierInfoDTO info = supplierClient.getInfoByState(purchase.getAddress().getState());
@@ -30,8 +34,20 @@ public class PurchaseService {
         purchaseDB.setPreparationTime(order.getPreparationTime());
         purchaseDB.setDestinationAddress(purchase.getAddress().toString());
 
+        try {
+            //Thread.sleep(2000);
+        } catch (Exception e) {
+            System.out.println("Fallback...");
+        }
+
         return purchaseDB;
 
+    }
+
+    public Purchase makePurchaseFallback(PurchaseDTO purchaseDTO){
+        Purchase purchaseFallback = new Purchase();
+        purchaseFallback.setDestinationAddress(purchaseDTO.getAddress().toString());
+        return purchaseFallback;
     }
 
     /* air01 - IMPLEMENTAÇÃO USANDO REST TEMPLATE COM RIBBON E LOADBALANCER
