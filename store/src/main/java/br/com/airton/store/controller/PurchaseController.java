@@ -6,10 +6,7 @@ import br.com.airton.store.service.PurchaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -23,8 +20,15 @@ public class PurchaseController {
 
     @PostMapping
     public Purchase purchase(@RequestBody PurchaseDTO purchase){
-        LOG.info("Purchase process...");
+        LOG.info("POST Purchase process...");
         return purchaseService.makePurchase(purchase);
+
+    }
+
+    @GetMapping
+    public Purchase getById(@PathVariable("id") Long id){
+        LOG.info("GET Purchase process...");
+        return purchaseService.getById(id);
 
     }
 
