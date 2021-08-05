@@ -8,6 +8,5 @@
 -  Feign
 -  Sleuth
 -  Paper Trail
--  Hystrix (Circuit Breaker and Fallback)
--  Bulkhead
--  API Gateway
+-  Circuit Breaker, Fallback and Bulkhead (Hystrix)
+-  API Gateway (Spring Zuul)

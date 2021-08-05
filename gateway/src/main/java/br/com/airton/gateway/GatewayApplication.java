@@ -1,13 +1,13 @@
-package br.com.alura.microservice.transportador;
+package br.com.airton.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TransporterrApplication {
+public class GatewayApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TransporterrApplication.class, args);
+		SpringApplication.run(GatewayApplication.class, args);
 	}
 
 }

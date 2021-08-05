@@ -1,4 +1,4 @@
-package br.com.alura.microservice.transportador.dto;
+package br.com.airton.transporter.dto;
 
 import java.time.LocalDate;
 

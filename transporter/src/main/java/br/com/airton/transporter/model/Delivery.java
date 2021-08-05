@@ -1,4 +1,4 @@
-package br.com.alura.microservice.transportador.model;
+package br.com.airton.transporter.model;
 
 import java.time.LocalDate;
 
