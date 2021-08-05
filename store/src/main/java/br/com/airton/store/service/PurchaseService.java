@@ -5,9 +5,9 @@ import br.com.airton.store.client.TransporterClient;
 import br.com.airton.store.dto.*;
 import br.com.airton.store.model.Purchase;
 //import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import br.com.airton.store.model.PurchaseState;
 import br.com.airton.store.repository.PurchaseRepository;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.netflix.hystrix.contrib.javanica.annotation.ObservableExecutionMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,34 +36,49 @@ public class PurchaseService {
         return purchaseRepository.findById(id).orElse(new Purchase());
     }
 
+    public Purchase retryPurchase(Long id){
+        return null;
+    }
+
+    public Purchase cancelPurchase(Long id){
+        return null;
+    }
+
     @HystrixCommand(
             fallbackMethod = "makePurchaseFallback",
             threadPoolKey = "makePurchaseThreadPool"
             )
     public Purchase makePurchase(PurchaseDTO purchase) {
 
-        SupplierInfoDTO info = supplierClient.getInfoByState(purchase.getAddress().getState());
+        Purchase purchaseDB = new Purchase();
+        purchaseDB.setState(PurchaseState.RECEIVED);
+        purchaseDB.setDestinationAddress(purchase.getAddress().toString());
+        purchaseRepository.save(purchaseDB);
+        purchase.setId(purchaseDB.getId());
 
+        SupplierInfoDTO info = supplierClient.getInfoByState(purchase.getAddress().getState());
         OrderInfoDTO order = supplierClient.makeOrder(purchase.getItems());
+        purchaseDB.setOrderId(order.getId());
+        purchaseDB.setPreparationTime(order.getPreparationTime());
+        purchaseDB.setState(PurchaseState.ORDER_MADE);
+        purchaseRepository.save(purchaseDB);
         LOG.info("Order {} sent to Supplier.", order.getId());
+
+        //SAGA
+        //if(1==1) throw new RuntimeException();
 
         DeliveryInfoDTO deliveryDTO = new DeliveryInfoDTO();
         deliveryDTO.setOrderId(order.getId());
         deliveryDTO.setPickupDate(LocalDate.now().plusDays(order.getPreparationTime()));
         deliveryDTO.setDestinationAddress(info.getAddress());
         deliveryDTO.setDestinationAddress(purchase.getAddress().toString());
-
         VoucherDTO voucher = transporterClient.deliveryReservation(deliveryDTO);
-
-        Purchase purchaseDB = new Purchase();
-        purchaseDB.setOrderId(order.getId());
-        purchaseDB.setPreparationTime(order.getPreparationTime());
-        purchaseDB.setDestinationAddress(purchase.getAddress().toString());
+        purchaseDB.setState(PurchaseState.DELIVERY_RESERVED);
         purchaseDB.setPickupDate(voucher.getDeliveryForecast());
         purchaseDB.setVoucher(voucher.getNumber());
-
         purchaseRepository.save(purchaseDB);
 
+        //Fallback testing:
         try {
             //Thread.sleep(2000);
         } catch (Exception e) {
@@ -76,6 +91,9 @@ public class PurchaseService {
 
     public Purchase makePurchaseFallback(PurchaseDTO purchaseDTO){
         System.out.println("FALLBACK...");
+        if(purchaseDTO.getId()!=null){
+            return purchaseRepository.findById(purchaseDTO.getId()).get();
+        }
         Purchase purchaseFallback = new Purchase();
         purchaseFallback.setDestinationAddress(purchaseDTO.getAddress().toString());
         return purchaseFallback;
