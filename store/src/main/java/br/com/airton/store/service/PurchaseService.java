@@ -1,9 +1,8 @@
 package br.com.airton.store.service;
 
 import br.com.airton.store.client.SupplierClient;
-import br.com.airton.store.dto.OrderInfoDTO;
-import br.com.airton.store.dto.SupplierInfoDTO;
-import br.com.airton.store.dto.PurchaseDTO;
+import br.com.airton.store.client.TransporterClient;
+import br.com.airton.store.dto.*;
 import br.com.airton.store.model.Purchase;
 //import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import br.com.airton.store.repository.PurchaseRepository;
@@ -14,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class PurchaseService {
 
@@ -21,6 +22,9 @@ public class PurchaseService {
 
     @Autowired
     private SupplierClient supplierClient;
+
+    @Autowired
+    private TransporterClient transporterClient;
 
     @Autowired
     private PurchaseRepository purchaseRepository;
@@ -43,17 +47,27 @@ public class PurchaseService {
         OrderInfoDTO order = supplierClient.makeOrder(purchase.getItems());
         LOG.info("Order {} sent to Supplier.", order.getId());
 
+        DeliveryInfoDTO deliveryDTO = new DeliveryInfoDTO();
+        deliveryDTO.setOrderId(order.getId());
+        deliveryDTO.setPickupDate(LocalDate.now().plusDays(order.getPreparationTime()));
+        deliveryDTO.setDestinationAddress(info.getAddress());
+        deliveryDTO.setDestinationAddress(purchase.getAddress().toString());
+
+        VoucherDTO voucher = transporterClient.deliveryReservation(deliveryDTO);
+
         Purchase purchaseDB = new Purchase();
         purchaseDB.setOrderId(order.getId());
         purchaseDB.setPreparationTime(order.getPreparationTime());
         purchaseDB.setDestinationAddress(purchase.getAddress().toString());
+        purchaseDB.setPickupDate(voucher.getDeliveryForecast());
+        purchaseDB.setVoucher(voucher.getNumber());
 
         purchaseRepository.save(purchaseDB);
 
         try {
             //Thread.sleep(2000);
         } catch (Exception e) {
-            System.out.println("Fallback...");
+
         }
 
         return purchaseDB;
@@ -61,6 +75,7 @@ public class PurchaseService {
     }
 
     public Purchase makePurchaseFallback(PurchaseDTO purchaseDTO){
+        System.out.println("FALLBACK...");
         Purchase purchaseFallback = new Purchase();
         purchaseFallback.setDestinationAddress(purchaseDTO.getAddress().toString());
         return purchaseFallback;
