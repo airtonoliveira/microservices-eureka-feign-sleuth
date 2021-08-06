@@ -9,4 +9,4 @@
 -  Sleuth
 -  Paper Trail
 -  Circuit Breaker, Fallback and Bulkhead (Hystrix)
--  API Gateway (Spring Zuul)
+-  API Gateway (Spring Gateway)
