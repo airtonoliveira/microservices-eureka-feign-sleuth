@@ -24,9 +24,8 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-
-
-
+      forwarded:
+        enabled: true
 
 
 
