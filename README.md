@@ -10,3 +10,5 @@
 -  Paper Trail
 -  Circuit Breaker, Fallback and Bulkhead (Hystrix)
 -  API Gateway (Spring Gateway)
+-  Authorization Server with Spring Security and Spring Cloud Oauth
+-  Feign Interceptor

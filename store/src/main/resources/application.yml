@@ -16,3 +16,7 @@ security:
   oauth2:
     resource:
       user-info-uri: http://localhost:8088/user
+
+#Permite o compartilhamento do contexto de segurança nas chamadas em métodos "hystrix" onde são executados em threads diferentes.
+hystrix:
+  shareSecurityContext: true

@@ -90,7 +90,7 @@ public class PurchaseService {
     }
 
     public Purchase makePurchaseFallback(PurchaseDTO purchaseDTO){
-        System.out.println("FALLBACK...");
+        System.out.print("FALLBACK...");
         if(purchaseDTO.getId()!=null){
             return purchaseRepository.findById(purchaseDTO.getId()).get();
         }
